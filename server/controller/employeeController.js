@@ -34,8 +34,19 @@ console.log(req.body);
     }
 };
 
+//all company
 
-// Get All Employees
+const getAllCompanies = async (req, res) => {
+    try {
+        const [companies] = await mysqlPool.execute('SELECT * FROM company');
+        return res.status(200).json({data:companies});
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Failed to retrieve companies', error: error.message });
+    }
+};
+
+//get  Employees by id
 const getAllEmployees = async (req, res) => {
     try {
         const [employees] = await mysqlPool.execute(`
@@ -161,4 +172,4 @@ const deleteEmployee = async (req, res) => {
     }
 };
 
-export {addEmployee,getAllEmployees,getEmployeeById,updateEmployee,deleteEmployee}
+export {addEmployee,getAllEmployees,getEmployeeById,updateEmployee,deleteEmployee,getAllCompanies}

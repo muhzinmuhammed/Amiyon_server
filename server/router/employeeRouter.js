@@ -4,7 +4,8 @@ import {
     getAllEmployees, 
     getEmployeeById, 
     updateEmployee, 
-    deleteEmployee 
+    deleteEmployee, 
+    getAllCompanies
 } from '../controller/employeeController.js';
 import { protect } from '../middleware/protect.js';
 import multer from 'multer';
@@ -26,5 +27,8 @@ route.put('/update_employee/:id',protect,upload.none(), updateEmployee);
 
 // Delete Employee
 route.delete('/delete_employee/:id',protect, deleteEmployee);
+
+// all compamy
+route.get('/all_company',protect,getAllCompanies)
 
 export default route;

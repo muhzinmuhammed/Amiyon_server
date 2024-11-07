@@ -50,14 +50,47 @@ const addCompany = async (req, res) => {
 
 // Read: Get all companies
 const getAllCompanies = async (req, res) => {
+    const { search = '', page = 1 } = req.query;
+    console.log(req.query);
+    
+    const pageSize = 10; // Number of companies per page
+    const offset = (page - 1) * pageSize;
+
     try {
-        const [companies] = await mysqlPool.execute('SELECT * FROM company');
-        return res.status(200).json({data:companies});
+        const query = `
+            SELECT * FROM company 
+            WHERE name LIKE ? 
+            ORDER BY id DESC 
+            LIMIT ${pageSize} OFFSET ${offset}
+        `;
+
+
+        const [companies] = await mysqlPool.execute(query, [`%${search}%`]);
+
+
+
+        // Fetch total count for pagination
+        const [countResult] = await mysqlPool.execute(
+            `SELECT COUNT(*) AS total FROM company WHERE name LIKE ?`,
+            [`%${search}%`]
+        );
+        const total = countResult[0].total;
+
+        return res.status(200).json({
+            data: companies,
+            pagination: {
+                total,
+                page,
+                pageSize,
+                totalPages: Math.ceil(total / pageSize),
+            },
+        });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Failed to retrieve companies', error: error.message });
     }
 };
+
 
 // Read: Get a company by ID
 const getCompanyById = async (req, res) => {
